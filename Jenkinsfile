@@ -20,7 +20,7 @@ pipeline {
          sh """"
          npm install
          ls -ltr
-         echo $appversion
+          echo "application version: $appversion"
          """
        }
     }
