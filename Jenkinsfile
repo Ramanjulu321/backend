@@ -8,7 +8,7 @@ pipeline {
         ansiColor('xterm')
     }
     stages {
-        stage("read the version"){
+        stage('read the version'){
             steps{
             def packageJson = readJson file: 'package.json'
             def appVersion = packageJson.version
