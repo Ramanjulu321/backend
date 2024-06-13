@@ -7,63 +7,24 @@ pipeline {
         disableConcurrentBuilds()
         ansiColor('xterm')
     }
-    parameters {
-        choice(name: 'action', choices: ['Apply', 'Destroy'], description: 'Pick something')
-    }
     stages {
-        stage('Init') {
-            steps {
-               sh """
-                cd 01-vpc
-                terraform init -reconfigure
-               """
+         stage("read the version")
+            steps{
+            def packageJson = readJson file: 'package.json'
+            def appVersion = packageJson.version
+            echo "application version: $appversion"
             }
-        }
-        stage('Plan') {
-            when {
-                expression{
-                    params.action == 'Apply'
-                }
-            }
-            steps {
-                sh """
-                cd 01-vpc
-                terraform plan
-                """
-            }
-        }
-        stage('Deploy') {
-            when {
-                expression{
-                    params.action == 'Apply'
-                }
-            }
-            input {
-                message "Should we continue?"
-                ok "Yes, we should."
-            }
-            steps {
-                sh """
-                cd 01-vpc
-                terraform apply -auto-approve
-                """
-            }
-        }
-
-        stage('Destroy') {
-            when {
-                expression{
-                    params.action == 'Destroy'
-                }
-            }
-            steps {
-                sh """
-                cd 01-vpc
-                terraform destroy -auto-approve
-                """
-            }
-        }
     }
+    stage('Install Dependencies') {
+       steps {
+         sh """"
+         npm install
+         ls -ltr
+         echo $appversion
+         """
+       }
+    }
+}
     post { 
         always { 
             echo 'I will always say Hello again!'
