@@ -60,6 +60,7 @@ stage('Build'){
                 }
             }
         }
+    }
     post { 
         always { 
             echo 'I will always say Hello again!'
@@ -72,4 +73,5 @@ stage('Build'){
             echo 'I will run when pipeline is failure'
         }
     }
+    
 }
