@@ -29,7 +29,7 @@ pipeline {
          """
        }
     }
-}
+
 stage('Build'){
             steps{
                 sh """
@@ -38,6 +38,7 @@ stage('Build'){
                 """
             }
         }
+    }
     post { 
         always { 
             echo 'I will always say Hello again!'
