@@ -25,10 +25,7 @@ pipeline {
         stage('Init'){
             steps{
                 sh """
-
-                    ls -la        
-                    cd terraform
-                    terraform init 
+                    ls -la       
                 """
             }
         }
