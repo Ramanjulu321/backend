@@ -26,7 +26,7 @@ pipeline {
             steps{
                 sh """
                     cd terraform
-                    terraform init -migrate-state
+                    terraform init -reconfigure
                 """
             }
         }
@@ -52,7 +52,7 @@ pipeline {
     post { 
         always { 
             echo 'I will always say Hello again!'
-            deleteDir()
+            // deleteDir()
         }
         success { 
             echo 'I will run when pipeline is success'
