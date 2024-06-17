@@ -49,7 +49,7 @@ stage('Build'){
                         groupId: 'com.expense',
                         version: "${appVersion}",
                         repository: "backend",
-                        credentialsId: 'nexus-auth',
+                        credentialsId: 'admin',
                         artifacts: [
                             [artifactId: "backend" ,
                             classifier: '',
