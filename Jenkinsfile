@@ -12,7 +12,7 @@ pipeline {
     }
     environment{
         def appVersion = '' //variable declaration
-        nexusUrl = 'nexus.daws-78s.store:8081'
+        nexusUrl = 'nexus.daws-78s-store:8081'
     }
     stages {
         stage('print the version'){
@@ -26,7 +26,7 @@ pipeline {
             steps{
                 sh """
                     cd terraform
-                    terraform init -upgrade
+                    terraform init
                 """
             }
         }
