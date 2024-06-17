@@ -7,51 +7,82 @@ pipeline {
         disableConcurrentBuilds()
         ansiColor('xterm')
     }
-    parameters {
-        string(name: 'appVersion', defaultValue: '1.0.0', description: 'What is the application version?')
+    parameters{
+        booleanParam(name: 'deploy', defaultValue: false, description: 'Toggle this value')
     }
     environment{
         def appVersion = '' //variable declaration
         nexusUrl = 'nexus.daws-78s.store:8081'
     }
     stages {
-        stage('print the version'){
+        stage('read the version'){
             steps{
                 script{
-                    echo "Application version: ${params.appVersion}"
+                    def packageJson = readJSON file: 'package.json'
+                    appVersion = packageJson.version
+                    echo "application version: $appVersion"
                 }
             }
         }
-        stage('Init'){
+        stage('Install Dependencies') {
+            steps {
+               sh """
+                npm install
+                ls -ltr
+                echo "application version: $appVersion"
+               """
+            }
+        }
+        stage('Build'){
             steps{
                 sh """
-                    ls -la       
+                zip -q -r backend-${appVersion}.zip * -x Jenkinsfile -x backend-${appVersion}.zip
+                ls -ltr
                 """
             }
         }
-        stage('Plan'){
+        
+        stage('Nexus Artifact Upload'){
             steps{
-                sh """
-                    pwd
-                    cd terraform
-                    terraform plan -var="app_version=${params.appVersion}"
-                """
+                script{
+                    nexusArtifactUploader(
+                        nexusVersion: 'nexus3',
+                        protocol: 'http',
+                        nexusUrl: "${nexusUrl}",
+                        groupId: 'com.expense',
+                        version: "${appVersion}",
+                        repository: "backend",
+                        credentialsId: 'nexus-auth',
+                        artifacts: [
+                            [artifactId: "backend" ,
+                            classifier: '',
+                            file: "backend-" + "${appVersion}" + '.zip',
+                            type: 'zip']
+                        ]
+                    )
+                }
             }
         }
-
         stage('Deploy'){
+            when{
+                expression{
+                    params.deploy
+                }
+            }
             steps{
-                sh """
-                    cd terraform
-                    terraform apply -auto-approve -var="app_version=${params.appVersion}"
-                """
+                script{
+                    def params = [
+                        string(name: 'appVersion', value: "${appVersion}")
+                    ]
+                    build job: 'backend-deploy', parameters: params, wait: false
+                }
             }
         }
     }
     post { 
         always { 
             echo 'I will always say Hello again!'
-            // deleteDir()
+            deleteDir()
         }
         success { 
             echo 'I will run when pipeline is success'
