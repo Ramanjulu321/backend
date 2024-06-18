@@ -40,7 +40,7 @@ pipeline {
         }
     }
 
-     stage('Nexus Artifact Uploader'){
+      stage('Nexus Artifact Upload'){
             steps{
                 script{
                     nexusArtifactUploader(
@@ -61,8 +61,6 @@ pipeline {
                 }
             }
         }
-
-
     post { 
         always { 
             echo 'I will always say Hello again!'
