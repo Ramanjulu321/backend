@@ -7,12 +7,8 @@ pipeline {
         disableConcurrentBuilds()
         ansiColor('xterm')
     }
-    parameters{
-        booleanParam(name: 'deploy', defaultValue: false, description: 'Toggle this value')
-    }
     environment{
         def appVersion = '' //variable declaration
-        nexusUrl = 'nexus.daws-78s.store:8081'
     }
     stages {
         stage('read the version'){
@@ -42,43 +38,7 @@ pipeline {
             }
         }
         
-        stage('Nexus Artifact Upload'){
-            steps{
-                script{
-                    nexusArtifactUploader(
-                        nexusVersion: 'nexus3',
-                        protocol: 'http',
-                        nexusUrl: "${nexusUrl}",
-                        groupId: 'com.expense',
-                        version: "${appVersion}",
-                        repository: "backend",
-                        credentialsId: 'nexus-auth',
-                        artifacts: [
-                            [artifactId: "backend" ,
-                            classifier: '',
-                            file: "backend-" + "${appVersion}" + '.zip',
-                            type: 'zip']
-                        ]
-                    )
-                }
-            }
-        }
-        stage('Deploy'){
-            when{
-                expression{
-                    params.deploy
-                }
-            }
-            steps{
-                script{
-                    def params = [
-                        string(name: 'appVersion', value: "${appVersion}")
-                    ]
-                    build job: 'backend-deploy', parameters: params, wait: false
-                }
-            }
-        }
-    }
+    }   
     post { 
         always { 
             echo 'I will always say Hello again!'
